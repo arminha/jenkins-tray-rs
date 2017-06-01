@@ -9,9 +9,16 @@ use std::env;
 
 fn main() {
     let jenkins_url = env::args().nth(1).expect("jenkins url");
-    if let Err(e) = do_request(&jenkins_url) {
-        println!("Error: {}", e.description());
-        println!("{:?}", e);
+    match retrieve_jobs(&jenkins_url) {
+        Err(e) => {
+            println!("Error: {}", e.description());
+            println!("{:?}", e);
+        }
+        Ok(jobs) => {
+            for job in jobs {
+                println!("{:?}", job);
+            }
+        }
     }
 }
 
@@ -24,14 +31,22 @@ struct JobList {
 struct Job {
     name: String,
     color: String,
+    #[serde(rename = "lastBuild")]
+    last_build: Option<Build>,
 }
 
-fn do_request<T: IntoUrl>(jenkins_url: T) -> Result<(), Box<std::error::Error>> {
+#[derive(Serialize, Deserialize, Debug)]
+struct Build {
+    number: u32,
+    result: String,
+    timestamp: u64,
+}
+
+fn retrieve_jobs<T: IntoUrl>(jenkins_url: T) -> Result<Vec<Job>, Box<std::error::Error>> {
     let url = jenkins_url
         .into_url()?
-        .join("api/json?tree=jobs[name,color]")?;
+        .join("api/json?tree=jobs[name,color,lastBuild[number,result,timestamp]]")?;
     let mut resp = reqwest::get(url)?;
     let job_list: JobList = resp.json()?;
-    println!("{:?}", job_list);
-    Ok(())
+    Ok(job_list.jobs)
 }
