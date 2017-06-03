@@ -1,5 +1,5 @@
 [root]
-name = "jenkins-tray-rs"
+name = "jenkins-tray"
 version = "0.1.0"
 dependencies = [
  "reqwest 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
