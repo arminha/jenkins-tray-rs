@@ -32,24 +32,24 @@ fn main() {
 
     {
         let tray_cell = tray_cell.clone();
-        tray.add_menu_item("Change icon", None, move |_| {
+        tray.add_menu_item("Change icon", None, move || {
             let mut tray = tray_cell.borrow_mut();
             tray.set_status(TrayStatus::Success);
         });
     }
     {
         let jenkins_url = jenkins_url.clone();
-        tray.add_menu_item("Print Jobs", None, move |_| print_jobs(&jenkins_url));
+        tray.add_menu_item("Print Jobs", None, move || print_jobs(&jenkins_url));
     }
     {
         let jenkins_url = jenkins_url.clone();
         tray.add_menu_item("Open Jenkins",
                            None,
-                           move |_| if open::that(&jenkins_url).is_err() {
+                           move || if open::that(&jenkins_url).is_err() {
                                println!("Failed to open Jenkins");
                            });
     }
-    tray.add_menu_item("Exit", Some("application-exit"), |_| gtk::main_quit());
+    tray.add_menu_item("Exit", Some("application-exit"), || gtk::main_quit());
 
     tray.show_all();
     std::mem::drop(tray);
