@@ -7,6 +7,7 @@ extern crate find_folder;
 extern crate gtk_sys;
 extern crate gtk;
 extern crate libappindicator;
+extern crate open;
 
 mod jenkins;
 
@@ -49,10 +50,21 @@ fn main() {
     });
 
     let mi3 = create_menu_item("Print Jobs", None);
-    mi3.connect_activate(move |_| print_jobs(&jenkins_url));
+    {
+        let jenkins_url = jenkins_url.clone();
+        mi3.connect_activate(move |_| print_jobs(&jenkins_url));
+    }
+
+    let mi4 = create_menu_item("Open Jenkins", None);
+    mi4.connect_activate(move |_| {
+        if open::that(&jenkins_url).is_err() {
+            println!("Failed to open Jenkins");
+        }
+    });
 
     m.append(&mi2);
     m.append(&mi3);
+    m.append(&mi4);
     m.append(&mi);
 
     mutex.lock().unwrap().set_menu(&mut m);
