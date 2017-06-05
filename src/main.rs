@@ -64,9 +64,8 @@ fn print_jobs<T: IntoUrl>(jenkins_url: T) {
             println!("{:?}", e);
         }
         Ok(jobs) => {
-            for job in jobs {
-                println!("{:?}", job);
-            }
+            let status = jenkins::aggregate_status(jobs);
+            println!("{:?}", status);
         }
     }
 }
