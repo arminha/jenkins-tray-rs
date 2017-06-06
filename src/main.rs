@@ -44,17 +44,39 @@ fn main() {
         let tray_cell = tray_cell.clone();
         tray.add_menu_item("Update",
                            None,
-                           move || if let Some(status) = retrieve_tray_status(&jenkins_url) {
-                               let mut tray = tray_cell.borrow_mut();
-                               tray.set_status(status);
-                           });
+                           move || update_status(&tray_cell, &jenkins_url));
     }
     tray.add_menu_item("Exit", Some("application-exit"), || gtk::main_quit());
 
     tray.show_all();
     std::mem::drop(tray);
 
+    {
+        let jenkins_url = jenkins_url.clone();
+        let tray_cell = tray_cell.clone();
+        gtk::idle_add(move || {
+            update_status(&tray_cell, &jenkins_url);
+            gtk::Continue(false)
+        });
+    }
+
+    {
+        let tray_cell = tray_cell.clone();
+        gtk::timeout_add(30000, move || {
+            update_status(&tray_cell, &jenkins_url);
+            gtk::Continue(true)
+        });
+    }
+
     gtk::main();
+}
+
+fn update_status(tray_cell: &Rc<RefCell<Tray>>, jenkins_url: &str) {
+    if let Some(status) = retrieve_tray_status(jenkins_url) {
+        let mut tray = tray_cell.borrow_mut();
+        println!("Update status: {:?}", &status);
+        tray.set_status(status);
+    }
 }
 
 fn retrieve_tray_status<T: IntoUrl>(jenkins_url: T) -> Option<TrayStatus> {
