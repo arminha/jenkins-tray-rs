@@ -20,6 +20,9 @@ use tray::{Tray, TrayStatus};
 use std::cell::RefCell;
 use std::env;
 use std::rc::Rc;
+use std::sync::mpsc::{self, Sender};
+use std::thread;
+use std::time::Duration;
 
 fn main() {
     let jenkins_url = env::args().nth(1).expect("jenkins url");
@@ -28,74 +31,86 @@ fn main() {
         return;
     }
 
-    let tray_cell = Rc::new(RefCell::new(Tray::new()));
-    let mut tray = tray_cell.borrow_mut();
+    // channel for tray updates
+    let (tx, rx) = mpsc::channel::<JenkinsStatus>();
 
-    {
-        let jenkins_url = jenkins_url.clone();
-        tray.add_menu_item("Open Jenkins",
-                           None,
-                           move || if open::that(&jenkins_url).is_err() {
-                               println!("Failed to open Jenkins");
-                           });
-    }
-    {
-        let jenkins_url = jenkins_url.clone();
-        let tray_cell = tray_cell.clone();
-        tray.add_menu_item("Update",
-                           None,
-                           move || update_status(&tray_cell, &jenkins_url));
-    }
+    let mut tray = Tray::new();
+    add_open_jenkins_menu_item(&mut tray, &jenkins_url);
+    add_update_menu_item(&mut tray, &tx, &jenkins_url);
     tray.add_menu_item("Exit", Some("application-exit"), || gtk::main_quit());
-
     tray.show_all();
-    std::mem::drop(tray);
 
-    {
-        let jenkins_url = jenkins_url.clone();
-        let tray_cell = tray_cell.clone();
-        gtk::idle_add(move || {
-            update_status(&tray_cell, &jenkins_url);
-            gtk::Continue(false)
-        });
-    }
+    let tray_cell = Rc::new(RefCell::new(tray));
+    gtk::idle_add(move || {
+                      if let Some(status) = rx.try_iter().next() {
+                          update_tray(&tray_cell, status);
+                      }
+                      gtk::Continue(true)
+                  });
 
-    {
-        let tray_cell = tray_cell.clone();
-        gtk::timeout_add(30000, move || {
-            update_status(&tray_cell, &jenkins_url);
-            gtk::Continue(true)
-        });
-    }
+    start_periodic_update(tx, jenkins_url, Duration::from_secs(30));
 
     gtk::main();
 }
 
-fn update_status(tray_cell: &Rc<RefCell<Tray>>, jenkins_url: &str) {
-    if let Some(status) = retrieve_tray_status(jenkins_url) {
-        let mut tray = tray_cell.borrow_mut();
-        println!("Update status: {:?}", &status);
-        tray.set_status(status);
+fn add_open_jenkins_menu_item(tray: &mut Tray, jenkins_url: &str) {
+    let jenkins_url = jenkins_url.to_owned();
+    tray.add_menu_item("Open Jenkins",
+                       None,
+                       move || if open::that(&jenkins_url).is_err() {
+                           println!("Failed to open Jenkins");
+                       });
+}
+
+fn add_update_menu_item(tray: &mut Tray, tx: &Sender<JenkinsStatus>, jenkins_url: &str) {
+    let jenkins_url = jenkins_url.to_owned();
+    let tx = tx.clone();
+    tray.add_menu_item("Update", None, move || {
+        let jenkins_url = jenkins_url.clone();
+        let tx = tx.clone();
+        thread::spawn(move || if let Some(status) = retrieve_status(&jenkins_url) {
+                          tx.send(status).unwrap();
+                      });
+    });
+}
+
+fn start_periodic_update(tx: Sender<JenkinsStatus>, jenkins_url: String, interval: Duration) {
+    thread::spawn(move || loop {
+                      if let Some(status) = retrieve_status(&jenkins_url) {
+                          tx.send(status).unwrap();
+                      }
+                      thread::sleep(interval);
+                  });
+}
+
+impl From<JenkinsStatus> for TrayStatus {
+    fn from(status: JenkinsStatus) -> Self {
+        match status {
+            JenkinsStatus::Success => TrayStatus::Success,
+            JenkinsStatus::Unstable(_) => TrayStatus::Unstable,
+            JenkinsStatus::Failure(_) => TrayStatus::Failure,
+            JenkinsStatus::Unknown => TrayStatus::Unknown,
+            JenkinsStatus::NotBuilt => TrayStatus::NotBuilt,
+        }
     }
 }
 
-fn retrieve_tray_status<T: IntoUrl>(jenkins_url: T) -> Option<TrayStatus> {
+fn update_tray(tray_cell: &Rc<RefCell<Tray>>, status: JenkinsStatus) {
+    let tray_status = status.into();
+    let mut tray = tray_cell.borrow_mut();
+    println!("Update status: {:?}", &tray_status);
+    tray.set_status(tray_status);
+}
+
+fn retrieve_status<T: IntoUrl>(jenkins_url: T) -> Option<JenkinsStatus> {
     match jenkins::retrieve_jobs(jenkins_url) {
         Err(e) => {
-            println!("Error: {}", e.description());
-            println!("{:?}", e);
+            println!("Error: {}\n{:?}", e.description(), e);
             None
         }
         Ok(jobs) => {
             let status = jenkins::aggregate_status(jobs);
-            let tray_status = match status {
-                JenkinsStatus::Success => TrayStatus::Success,
-                JenkinsStatus::Unstable(_) => TrayStatus::Unstable,
-                JenkinsStatus::Failure(_) => TrayStatus::Failure,
-                JenkinsStatus::Unknown => TrayStatus::Unknown,
-                JenkinsStatus::NotBuilt => TrayStatus::NotBuilt,
-            };
-            Some(tray_status)
+            Some(status)
         }
     }
 }
