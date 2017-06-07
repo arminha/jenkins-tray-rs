@@ -10,7 +10,6 @@ pub enum TrayStatus {
     Unstable,
     Failure,
     NotBuilt,
-    Disabled,
 }
 
 impl TrayStatus {
@@ -24,7 +23,6 @@ impl TrayStatus {
             TrayStatus::Unstable => "yellow.png",
             TrayStatus::Failure => "red.png",
             TrayStatus::NotBuilt => "grey.png",
-            TrayStatus::Disabled => "grey.png",
         };
         assets.join(file).to_string_lossy().into_owned()
     }
@@ -36,7 +34,6 @@ impl TrayStatus {
             TrayStatus::Unstable => "Unstable",
             TrayStatus::Failure => "Failure",
             TrayStatus::NotBuilt => "NotBuilt",
-            TrayStatus::Disabled => "Disabled",
         }
     }
 }
