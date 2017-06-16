@@ -41,12 +41,12 @@ fn main() {
     tray.show_all();
 
     let tray_cell = Rc::new(RefCell::new(tray));
-    gtk::idle_add(move || {
-                      if let Some(status) = rx.try_iter().next() {
-                          update_tray(&tray_cell, status);
-                      }
-                      gtk::Continue(true)
-                  });
+    gtk::timeout_add(500, move || {
+        if let Some(status) = rx.try_iter().next() {
+            update_tray(&tray_cell, status);
+        }
+        gtk::Continue(true)
+    });
 
     start_periodic_update(tx, jenkins_url, Duration::from_secs(30));
 
