@@ -55,11 +55,11 @@ fn main() {
 
 fn add_open_jenkins_menu_item(tray: &mut Tray, jenkins_url: &str) {
     let jenkins_url = jenkins_url.to_owned();
-    tray.add_menu_item("Open Jenkins",
-                       None,
-                       move || if open::that(&jenkins_url).is_err() {
-                           println!("Failed to open Jenkins");
-                       });
+    tray.add_menu_item("Open Jenkins", None, move || if open::that(&jenkins_url)
+        .is_err()
+    {
+        println!("Failed to open Jenkins");
+    });
 }
 
 fn add_update_menu_item(tray: &mut Tray, tx: &Sender<JenkinsStatus>, jenkins_url: &str) {
@@ -68,19 +68,22 @@ fn add_update_menu_item(tray: &mut Tray, tx: &Sender<JenkinsStatus>, jenkins_url
     tray.add_menu_item("Update", None, move || {
         let jenkins_url = jenkins_url.clone();
         let tx = tx.clone();
-        thread::spawn(move || if let Some(status) = retrieve_status(&jenkins_url) {
-                          tx.send(status).unwrap();
-                      });
+        thread::spawn(move || if let Some(status) = retrieve_status(
+            &jenkins_url,
+        )
+        {
+            tx.send(status).unwrap();
+        });
     });
 }
 
 fn start_periodic_update(tx: Sender<JenkinsStatus>, jenkins_url: String, interval: Duration) {
     thread::spawn(move || loop {
-                      if let Some(status) = retrieve_status(&jenkins_url) {
-                          tx.send(status).unwrap();
-                      }
-                      thread::sleep(interval);
-                  });
+        if let Some(status) = retrieve_status(&jenkins_url) {
+            tx.send(status).unwrap();
+        }
+        thread::sleep(interval);
+    });
 }
 
 impl From<JenkinsStatus> for TrayStatus {

@@ -99,11 +99,7 @@ impl JenkinsStatus {
         fn more_recent(job1: Job, job2: Job) -> Job {
             let t1 = job1.build_timestamp().unwrap_or(0);
             let t2 = job2.build_timestamp().unwrap_or(0);
-            if t1 >= t2 {
-                job1
-            } else {
-                job2
-            }
+            if t1 >= t2 { job1 } else { job2 }
         }
         match self {
             JenkinsStatus::Unknown => other,
@@ -131,9 +127,7 @@ impl JenkinsStatus {
             }
             JenkinsStatus::Failure(job1) => {
                 match other {
-                    JenkinsStatus::Failure(job2) => {
-                        JenkinsStatus::Failure(more_recent(job1, job2))
-                    }
+                    JenkinsStatus::Failure(job2) => JenkinsStatus::Failure(more_recent(job1, job2)),
                     _ => JenkinsStatus::Failure(job1),
                 }
             }
@@ -142,9 +136,9 @@ impl JenkinsStatus {
 }
 
 pub fn retrieve_jobs<T: IntoUrl>(jenkins_url: T) -> Result<Vec<Job>, Box<Error>> {
-    let url = jenkins_url
-        .into_url()?
-        .join("api/json?tree=jobs[name,color,lastBuild[number,result,timestamp]]")?;
+    let url = jenkins_url.into_url()?.join(
+        "api/json?tree=jobs[name,color,lastBuild[number,result,timestamp]]",
+    )?;
     let mut resp = reqwest::get(url)?;
     let job_list: JobList = resp.json()?;
     Ok(job_list.jobs)

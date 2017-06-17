@@ -72,14 +72,18 @@ impl Tray {
     }
 
     pub fn set_status(&mut self, status: TrayStatus) {
-        self.indicator
-            .set_icon_full(&status.icon_name(), status.desc());
+        self.indicator.set_icon_full(
+            &status.icon_name(),
+            status.desc(),
+        );
     }
 
-    pub fn add_menu_item<F: Fn() + 'static>(&mut self,
-                                            label: &str,
-                                            icon_name: Option<&str>,
-                                            callback: F) {
+    pub fn add_menu_item<F: Fn() + 'static>(
+        &mut self,
+        label: &str,
+        icon_name: Option<&str>,
+        callback: F,
+    ) {
         let item = create_menu_item(label, icon_name);
         item.connect_activate(move |_| callback());
         self.menu.append(&item);
