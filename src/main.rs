@@ -38,7 +38,6 @@ fn main() {
     add_open_jenkins_menu_item(&mut tray, &jenkins_url);
     add_update_menu_item(&mut tray, &tx, &jenkins_url);
     tray.add_menu_item("Exit", Some("application-exit"), || gtk::main_quit());
-    tray.show_all();
 
     let tray_cell = Rc::new(RefCell::new(tray));
     gtk::timeout_add(500, move || {

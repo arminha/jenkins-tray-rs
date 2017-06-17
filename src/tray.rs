@@ -78,18 +78,13 @@ impl Tray {
         );
     }
 
-    pub fn add_menu_item<F: Fn() + 'static>(
-        &mut self,
-        label: &str,
-        icon_name: Option<&str>,
-        callback: F,
-    ) {
+    pub fn add_menu_item<F>(&mut self, label: &str, icon_name: Option<&str>, callback: F)
+    where
+        F: Fn() + 'static,
+    {
         let item = create_menu_item(label, icon_name);
         item.connect_activate(move |_| callback());
         self.menu.append(&item);
-    }
-
-    pub fn show_all(&mut self) {
         self.menu.show_all();
     }
 }
