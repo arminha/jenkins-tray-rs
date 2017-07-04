@@ -1,4 +1,5 @@
-use reqwest::{self, IntoUrl};
+use reqwest::{Client, IntoUrl, Url};
+use reqwest::header::{Authorization, Basic};
 
 use std::error::Error;
 
@@ -78,6 +79,13 @@ pub enum JenkinsStatus {
     Unknown,
 }
 
+pub struct JenkinsView {
+    jenkins_url: Url,
+    username: Option<String>,
+    access_token: Option<String>,
+    client: Client,
+}
+
 impl Job {
     fn build_timestamp(&self) -> Option<u64> {
         self.last_build.as_ref().map(|b| b.timestamp)
@@ -135,13 +143,38 @@ impl JenkinsStatus {
     }
 }
 
-pub fn retrieve_jobs<T: IntoUrl>(jenkins_url: T) -> Result<Vec<Job>, Box<Error>> {
-    let url = jenkins_url.into_url()?.join(
-        "api/json?tree=jobs[name,color,lastBuild[number,result,timestamp]]",
-    )?;
-    let mut resp = reqwest::get(url)?;
-    let job_list: JobList = resp.json()?;
-    Ok(job_list.jobs)
+impl JenkinsView {
+    pub fn new<T: IntoUrl>(
+        jenkins_url: T,
+        username: Option<String>,
+        access_token: Option<String>,
+    ) -> Result<JenkinsView, Box<Error>> {
+        let jenkins_url = jenkins_url.into_url()?;
+        let client = Client::new()?;
+        Ok(JenkinsView {
+            jenkins_url,
+            username,
+            access_token,
+            client,
+        })
+    }
+
+    pub fn retrieve_jobs(&self) -> Result<Vec<Job>, Box<Error>> {
+        let url = self.jenkins_url.join(
+            "api/json?tree=jobs[name,color,lastBuild[number,result,timestamp]]",
+        )?;
+        let mut request = self.client.get(url);
+        if self.username.is_some() && self.access_token.is_some() {
+            let credentials = Basic {
+                username: self.username.as_ref().unwrap().clone(),
+                password: self.access_token.clone(),
+            };
+            request = request.header(Authorization(credentials));
+        }
+        let mut resp = request.send()?;
+        let job_list: JobList = resp.json()?;
+        Ok(job_list.jobs)
+    }
 }
 
 pub fn aggregate_status(jobs: Vec<Job>) -> JenkinsStatus {

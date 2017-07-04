@@ -12,14 +12,13 @@ extern crate open;
 mod jenkins;
 mod tray;
 
-use reqwest::IntoUrl;
-
-use jenkins::JenkinsStatus;
+use jenkins::{JenkinsStatus, JenkinsView};
 use tray::{Tray, TrayStatus};
 
 use std::cell::RefCell;
 use std::env;
 use std::rc::Rc;
+use std::sync::Arc;
 use std::sync::mpsc::{self, Sender};
 use std::thread;
 use std::time::Duration;
@@ -34,9 +33,11 @@ fn main() {
     // channel for tray updates
     let (tx, rx) = mpsc::channel::<JenkinsStatus>();
 
+    let jenkins = Arc::new(JenkinsView::new(&jenkins_url, None, None).unwrap());
+
     let mut tray = Tray::new();
     add_open_jenkins_menu_item(&mut tray, &jenkins_url);
-    add_update_menu_item(&mut tray, &tx, &jenkins_url);
+    add_update_menu_item(&mut tray, &tx, jenkins.clone());
     tray.add_menu_item("Exit", Some("application-exit"), || gtk::main_quit());
 
     let tray_cell = Rc::new(RefCell::new(tray));
@@ -47,7 +48,7 @@ fn main() {
         gtk::Continue(true)
     });
 
-    start_periodic_update(tx, jenkins_url, Duration::from_secs(30));
+    start_periodic_update(tx, jenkins, Duration::from_secs(30));
 
     gtk::main();
 }
@@ -61,24 +62,20 @@ fn add_open_jenkins_menu_item(tray: &mut Tray, jenkins_url: &str) {
     });
 }
 
-fn add_update_menu_item(tray: &mut Tray, tx: &Sender<JenkinsStatus>, jenkins_url: &str) {
-    let jenkins_url = jenkins_url.to_owned();
+fn add_update_menu_item(tray: &mut Tray, tx: &Sender<JenkinsStatus>, jenkins: Arc<JenkinsView>) {
     let tx = tx.clone();
     tray.add_menu_item("Update", None, move || {
-        let jenkins_url = jenkins_url.clone();
         let tx = tx.clone();
-        thread::spawn(move || if let Some(status) = retrieve_status(
-            &jenkins_url,
-        )
-        {
+        let jenkins = jenkins.clone();
+        thread::spawn(move || if let Some(status) = retrieve_status(&jenkins) {
             tx.send(status).unwrap();
         });
     });
 }
 
-fn start_periodic_update(tx: Sender<JenkinsStatus>, jenkins_url: String, interval: Duration) {
+fn start_periodic_update(tx: Sender<JenkinsStatus>, jenkins: Arc<JenkinsView>, interval: Duration) {
     thread::spawn(move || loop {
-        if let Some(status) = retrieve_status(&jenkins_url) {
+        if let Some(status) = retrieve_status(&jenkins) {
             tx.send(status).unwrap();
         }
         thread::sleep(interval);
@@ -104,8 +101,8 @@ fn update_tray(tray_cell: &Rc<RefCell<Tray>>, status: JenkinsStatus) {
     tray.set_status(tray_status);
 }
 
-fn retrieve_status<T: IntoUrl>(jenkins_url: T) -> Option<JenkinsStatus> {
-    match jenkins::retrieve_jobs(jenkins_url) {
+fn retrieve_status(jenkins: &JenkinsView) -> Option<JenkinsStatus> {
+    match jenkins.retrieve_jobs() {
         Err(e) => {
             println!("Error: {}\n{:?}", e.description(), e);
             None
