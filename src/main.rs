@@ -11,6 +11,7 @@ extern crate open;
 
 mod jenkins;
 mod tray;
+mod xdg_basedir;
 
 use jenkins::{JenkinsStatus, JenkinsView};
 use tray::{Tray, TrayStatus};
