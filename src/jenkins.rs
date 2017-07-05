@@ -52,7 +52,7 @@ enum Color {
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 struct Build {
     number: u32,
-    result: BuildResult,
+    result: Option<BuildResult>,
     timestamp: u64,
 }
 
