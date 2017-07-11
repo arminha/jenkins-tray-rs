@@ -11,6 +11,7 @@ libappindicator = "0.2"
 gtk-sys = "0.3"
 find_folder = "0.3"
 open = "1.2"
+toml = "0.4.2"
 
 [dependencies.gtk]
 version = "0.1"

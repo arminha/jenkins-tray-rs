@@ -8,16 +8,19 @@ extern crate gtk_sys;
 extern crate gtk;
 extern crate libappindicator;
 extern crate open;
+extern crate toml;
 
+mod config;
 mod jenkins;
 mod tray;
 mod xdg_basedir;
 
+use config::{Config, JenkinsConfig};
 use jenkins::{JenkinsStatus, JenkinsView};
 use tray::{Tray, TrayStatus};
 
 use std::cell::RefCell;
-use std::env;
+use std::error::Error;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::sync::mpsc::{self, Sender};
@@ -25,7 +28,8 @@ use std::thread;
 use std::time::Duration;
 
 fn main() {
-    let jenkins_url = env::args().nth(1).expect("jenkins url");
+    let config = read_config_file().expect("could not read config file");
+    let jenkins_config = &config.jenkins;
     if gtk::init().is_err() {
         println!("Failed to initialize GTK.");
         return;
@@ -34,10 +38,16 @@ fn main() {
     // channel for tray updates
     let (tx, rx) = mpsc::channel::<JenkinsStatus>();
 
-    let jenkins = Arc::new(JenkinsView::new(&jenkins_url, None, None).unwrap());
+    let jenkins = Arc::new(
+        JenkinsView::new(
+            &jenkins_config.url,
+            (&jenkins_config.user).clone(),
+            (&jenkins_config.access_token).clone(),
+        ).unwrap(),
+    );
 
     let mut tray = Tray::new();
-    add_open_jenkins_menu_item(&mut tray, &jenkins_url);
+    add_open_jenkins_menu_item(&mut tray, &jenkins_config.url);
     add_update_menu_item(&mut tray, &tx, jenkins.clone());
     tray.add_menu_item("Exit", Some("application-exit"), || gtk::main_quit());
 
@@ -52,6 +62,27 @@ fn main() {
     start_periodic_update(tx, jenkins, Duration::from_secs(30));
 
     gtk::main();
+}
+
+fn read_config_file() -> Result<Config, Box<Error>> {
+    let mut path = xdg_basedir::config_home();
+    path.push("jenkins-tray");
+    path.push("settings.toml");
+    if path.is_file() {
+        Config::from_file(&path)
+    } else {
+        let config = Config {
+            jenkins: JenkinsConfig {
+                url: "https://example.com/".to_string(),
+                name: None,
+                user: None,
+                access_token: None,
+            },
+        };
+        config.write_to_file(&path)?;
+        println!("Please edit config file at {}", path.display());
+        std::process::exit(0);
+    }
 }
 
 fn add_open_jenkins_menu_item(tray: &mut Tray, jenkins_url: &str) {
