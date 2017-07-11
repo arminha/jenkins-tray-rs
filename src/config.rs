@@ -24,10 +24,7 @@ impl Config {
         let mut file = File::open(path)?;
         let mut content = String::new();
         file.read_to_string(&mut content)?;
-        toml::from_str(&content).map_err(|e| {
-            let boxed: Box<Error> = Box::new(e);
-            boxed
-        })
+        toml::from_str(&content).map_err(|e| Box::new(e) as Box<Error>)
     }
 
     pub fn write_to_file(&self, path: &Path) -> Result<(), Box<Error>> {

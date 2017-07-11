@@ -18,11 +18,10 @@ impl TrayStatus {
             .for_folder("assets")
             .unwrap();
         let file = match *self {
-            TrayStatus::Unknown => "grey.png",
+            TrayStatus::Unknown | TrayStatus::NotBuilt => "grey.png",
             TrayStatus::Success => "blue.png",
             TrayStatus::Unstable => "yellow.png",
             TrayStatus::Failure => "red.png",
-            TrayStatus::NotBuilt => "grey.png",
         };
         assets.join(file).to_string_lossy().into_owned()
     }
