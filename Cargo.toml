@@ -8,11 +8,8 @@ reqwest = "0.6"
 serde = "1.0"
 serde_derive = "1.0"
 libappindicator = "0.2"
+gtk = { version = "0.1", features = ["v3_12"] }
 gtk-sys = "0.3"
 find_folder = "0.3"
 open = "1.2"
 toml = "0.4.2"
-
-[dependencies.gtk]
-version = "0.1"
-features = ["v3_12"]
