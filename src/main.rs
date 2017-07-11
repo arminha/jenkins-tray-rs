@@ -21,6 +21,7 @@ use tray::{Tray, TrayStatus};
 
 use std::cell::RefCell;
 use std::error::Error;
+use std::fs;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::sync::mpsc::{self, Sender};
@@ -79,6 +80,7 @@ fn read_config_file() -> Result<Config, Box<Error>> {
                 access_token: None,
             },
         };
+        fs::create_dir_all(path.parent().unwrap())?;
         config.write_to_file(&path)?;
         println!("Please edit config file at {}", path.display());
         std::process::exit(0);
