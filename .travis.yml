@@ -12,6 +12,11 @@ matrix:
 dist: trusty
 sudo: false
 
+addons:
+  apt:
+    packages:
+      - libappindicator3-dev
+
 cache: cargo
 
 install:
