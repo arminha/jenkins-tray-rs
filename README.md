@@ -1,5 +1,5 @@
-jenkins-tray
-============
+jenkins-tray-rs
+===============
 
 A system tray icon to display Jenkins build status.
 
