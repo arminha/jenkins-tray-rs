@@ -150,7 +150,7 @@ impl JenkinsView {
         access_token: Option<String>,
     ) -> Result<JenkinsView, Box<Error>> {
         let jenkins_url = jenkins_url.into_url()?;
-        let client = Client::new()?;
+        let client = Client::new();
         Ok(JenkinsView {
             jenkins_url,
             username,
@@ -169,7 +169,7 @@ impl JenkinsView {
                 username: self.username.as_ref().unwrap().clone(),
                 password: self.access_token.clone(),
             };
-            request = request.header(Authorization(credentials));
+            request.header(Authorization(credentials));
         }
         let mut resp = request.send()?;
         let job_list: JobList = resp.json()?;
