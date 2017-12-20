@@ -14,9 +14,9 @@ lto = true
 reqwest = "0.6"
 serde = "1.0"
 serde_derive = "1.0"
-libappindicator = "0.2"
-gtk = { version = "0.1", features = ["v3_10"] }
-gtk-sys = "0.3"
+libappindicator = "0.3"
+gtk = { version = "0.2", features = ["v3_10"] }
+gtk-sys = "0.4"
 find_folder = "0.3"
 open = "1.2"
 toml = "0.4.2"
