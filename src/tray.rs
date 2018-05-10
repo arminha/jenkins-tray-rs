@@ -3,7 +3,7 @@ use gtk::{Box, ContainerExt, IconSize, Image, Label, Menu, MenuItem, MenuItemExt
           Orientation, WidgetExt};
 use libappindicator::{AppIndicator, AppIndicatorStatus};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum TrayStatus {
     Unknown,
     Success,

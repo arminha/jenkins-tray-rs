@@ -131,7 +131,7 @@ impl From<JenkinsStatus> for TrayStatus {
 fn update_tray(tray_cell: &Rc<RefCell<Tray>>, status: JenkinsStatus) {
     let tray_status = status.into();
     let mut tray = tray_cell.borrow_mut();
-    println!("Update status: {:?}", &tray_status);
+    println!("Update status: {:?}", tray_status);
     tray.set_status(tray_status);
 }
 
