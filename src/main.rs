@@ -4,8 +4,8 @@ extern crate serde_derive;
 extern crate serde;
 
 extern crate find_folder;
-extern crate gtk_sys;
 extern crate gtk;
+extern crate gtk_sys;
 extern crate libappindicator;
 extern crate open;
 extern crate toml;
@@ -23,8 +23,8 @@ use std::cell::RefCell;
 use std::error::Error;
 use std::fs;
 use std::rc::Rc;
-use std::sync::Arc;
 use std::sync::mpsc::{self, Sender};
+use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
@@ -89,10 +89,10 @@ fn read_config_file() -> Result<Config, Box<Error>> {
 
 fn add_open_jenkins_menu_item(tray: &mut Tray, jenkins_url: &str) {
     let jenkins_url = jenkins_url.to_owned();
-    tray.add_menu_item("Open Jenkins", None, move || if open::that(&jenkins_url)
-        .is_err()
-    {
-        println!("Failed to open Jenkins");
+    tray.add_menu_item("Open Jenkins", None, move || {
+        if open::that(&jenkins_url).is_err() {
+            println!("Failed to open Jenkins");
+        }
     });
 }
 
@@ -101,8 +101,10 @@ fn add_update_menu_item(tray: &mut Tray, tx: &Sender<JenkinsStatus>, jenkins: Ar
     tray.add_menu_item("Update", None, move || {
         let tx = tx.clone();
         let jenkins = jenkins.clone();
-        thread::spawn(move || if let Some(status) = retrieve_status(&jenkins) {
-            tx.send(status).unwrap();
+        thread::spawn(move || {
+            if let Some(status) = retrieve_status(&jenkins) {
+                tx.send(status).unwrap();
+            }
         });
     });
 }

@@ -71,10 +71,8 @@ impl Tray {
     }
 
     pub fn set_status(&mut self, status: TrayStatus) {
-        self.indicator.set_icon_full(
-            &status.icon_name(),
-            status.desc(),
-        );
+        self.indicator
+            .set_icon_full(&status.icon_name(), status.desc());
     }
 
     pub fn add_menu_item<F>(&mut self, label: &str, icon_name: Option<&str>, callback: F)

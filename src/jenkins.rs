@@ -1,5 +1,5 @@
-use reqwest::{Client, IntoUrl, Url};
 use reqwest::header::{Authorization, Basic};
+use reqwest::{Client, IntoUrl, Url};
 
 use std::error::Error;
 
@@ -107,38 +107,31 @@ impl JenkinsStatus {
         fn more_recent(job1: Job, job2: Job) -> Job {
             let t1 = job1.build_timestamp().unwrap_or(0);
             let t2 = job2.build_timestamp().unwrap_or(0);
-            if t1 >= t2 { job1 } else { job2 }
+            if t1 >= t2 {
+                job1
+            } else {
+                job2
+            }
         }
         match self {
             JenkinsStatus::Unknown => other,
-            JenkinsStatus::NotBuilt => {
-                match other {
-                    JenkinsStatus::Unknown => self,
-                    _ => other,
-                }
-            }
-            JenkinsStatus::Success => {
-                match other {
-                    JenkinsStatus::Unstable(_) |
-                    JenkinsStatus::Failure(_) => other,
-                    _ => self,
-                }
-            }
-            JenkinsStatus::Unstable(job1) => {
-                match other {
-                    JenkinsStatus::Failure(_) => other,
-                    JenkinsStatus::Unstable(job2) => {
-                        JenkinsStatus::Unstable(more_recent(job1, job2))
-                    }
-                    _ => JenkinsStatus::Unstable(job1),
-                }
-            }
-            JenkinsStatus::Failure(job1) => {
-                match other {
-                    JenkinsStatus::Failure(job2) => JenkinsStatus::Failure(more_recent(job1, job2)),
-                    _ => JenkinsStatus::Failure(job1),
-                }
-            }
+            JenkinsStatus::NotBuilt => match other {
+                JenkinsStatus::Unknown => self,
+                _ => other,
+            },
+            JenkinsStatus::Success => match other {
+                JenkinsStatus::Unstable(_) | JenkinsStatus::Failure(_) => other,
+                _ => self,
+            },
+            JenkinsStatus::Unstable(job1) => match other {
+                JenkinsStatus::Failure(_) => other,
+                JenkinsStatus::Unstable(job2) => JenkinsStatus::Unstable(more_recent(job1, job2)),
+                _ => JenkinsStatus::Unstable(job1),
+            },
+            JenkinsStatus::Failure(job1) => match other {
+                JenkinsStatus::Failure(job2) => JenkinsStatus::Failure(more_recent(job1, job2)),
+                _ => JenkinsStatus::Failure(job1),
+            },
         }
     }
 }
@@ -160,9 +153,8 @@ impl JenkinsView {
     }
 
     pub fn retrieve_jobs(&self) -> Result<Vec<Job>, Box<Error>> {
-        let url = self.jenkins_url.join(
-            "api/json?tree=jobs[name,color,lastBuild[number,result,timestamp]]",
-        )?;
+        let url = self.jenkins_url
+            .join("api/json?tree=jobs[name,color,lastBuild[number,result,timestamp]]")?;
         let mut request = self.client.get(url);
         if self.username.is_some() && self.access_token.is_some() {
             let credentials = Basic {
