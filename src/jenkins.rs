@@ -153,7 +153,8 @@ impl JenkinsView {
     }
 
     pub fn retrieve_jobs(&self) -> Result<Vec<Job>, Box<Error>> {
-        let url = self.jenkins_url
+        let url = self
+            .jenkins_url
             .join("api/json?tree=jobs[name,color,lastBuild[number,result,timestamp]]")?;
         let mut request = self.client.get(url);
         if self.username.is_some() && self.access_token.is_some() {

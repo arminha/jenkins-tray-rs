@@ -1,6 +1,8 @@
 use find_folder;
-use gtk::{Box, ContainerExt, IconSize, Image, Label, Menu, MenuItem, MenuItemExt, MenuShellExt,
-          Orientation, WidgetExt};
+use gtk::{
+    Box, ContainerExt, IconSize, Image, Label, Menu, MenuItem, MenuItemExt, MenuShellExt,
+    Orientation, WidgetExt,
+};
 use libappindicator::{AppIndicator, AppIndicatorStatus};
 
 #[derive(Debug, Clone, Copy)]
