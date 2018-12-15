@@ -61,7 +61,8 @@ fn main() {
             &jenkins_config.url,
             (&jenkins_config.user).clone(),
             (&jenkins_config.access_token).clone(),
-        ).unwrap(),
+        )
+        .unwrap(),
     );
 
     let mut tray = Tray::new();
