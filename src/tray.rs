@@ -31,11 +31,11 @@ pub enum TrayStatus {
 }
 
 impl TrayStatus {
-    fn icon_name(&self) -> String {
+    fn icon_name(self) -> String {
         let assets = find_folder::Search::ParentsThenKids(3, 3)
             .for_folder("assets")
             .unwrap();
-        let file = match *self {
+        let file = match self {
             TrayStatus::Unknown | TrayStatus::NotBuilt => "grey.png",
             TrayStatus::Success => "blue.png",
             TrayStatus::Unstable => "yellow.png",
@@ -44,8 +44,8 @@ impl TrayStatus {
         assets.join(file).to_string_lossy().into_owned()
     }
 
-    fn desc(&self) -> &str {
-        match *self {
+    fn desc(self) -> &'static str {
+        match self {
             TrayStatus::Unknown => "Unknown",
             TrayStatus::Success => "Success",
             TrayStatus::Unstable => "Unstable",
