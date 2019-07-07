@@ -19,4 +19,4 @@ gtk = { version = "0.4", features = ["v3_10"] }
 gtk-sys = "0.6"
 find_folder = "0.3"
 open = "1.2"
-toml = "0.4.2"
+toml = "0.5.1"
