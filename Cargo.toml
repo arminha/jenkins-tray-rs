@@ -11,7 +11,7 @@ homepage = "https://github.com/arminha/jenkins-tray-rs"
 lto = true
 
 [dependencies]
-reqwest = "0.8"
+reqwest = "0.9"
 serde = "1.0"
 serde_derive = "1.0"
 libappindicator = "0.4"

@@ -14,7 +14,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
-use reqwest::header::{Authorization, Basic};
 use reqwest::{Client, IntoUrl, Url};
 
 use std::error::Error;
@@ -174,11 +173,8 @@ impl JenkinsView {
             .join("api/json?tree=jobs[name,color,lastBuild[number,result,timestamp]]")?;
         let mut request = self.client.get(url);
         if self.username.is_some() && self.access_token.is_some() {
-            let credentials = Basic {
-                username: self.username.as_ref().unwrap().clone(),
-                password: self.access_token.clone(),
-            };
-            request.header(Authorization(credentials));
+            request =
+                request.basic_auth(self.username.as_ref().unwrap(), self.access_token.as_ref());
         }
         let mut resp = request.send()?;
         let job_list: JobList = resp.json()?;
