@@ -32,9 +32,9 @@ mod jenkins;
 mod tray;
 mod xdg_basedir;
 
-use config::{Config, JenkinsConfig};
-use jenkins::{JenkinsStatus, JenkinsView};
-use tray::{Tray, TrayStatus};
+use crate::config::{Config, JenkinsConfig};
+use crate::jenkins::{JenkinsStatus, JenkinsView};
+use crate::tray::{Tray, TrayStatus};
 
 use std::cell::RefCell;
 use std::error::Error;
