@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 use find_folder;
 use gtk::{
-    Box, ContainerExt, IconSize, Image, Label, Menu, MenuItem, MenuItemExt, MenuShellExt,
+    Box, ContainerExt, GtkMenuItemExt, IconSize, Image, Label, Menu, MenuItem, MenuShellExt,
     Orientation, WidgetExt,
 };
 use libappindicator::{AppIndicator, AppIndicatorStatus};
@@ -62,8 +62,8 @@ pub struct Tray {
 
 fn create_menu_item(label: &str, icon_name: Option<&str>) -> MenuItem {
     if let Some(icon_name) = icon_name {
-        let icon = Image::new_from_icon_name(icon_name, IconSize::Menu.into());
-        let lbl = Label::new(label);
+        let icon = Image::new_from_icon_name(Some(icon_name), IconSize::Menu);
+        let lbl = Label::new(Some(label));
         let b = Box::new(Orientation::Horizontal, 6);
         b.add(&icon);
         b.add(&lbl);
@@ -78,7 +78,7 @@ fn create_menu_item(label: &str, icon_name: Option<&str>) -> MenuItem {
 impl Tray {
     pub fn new() -> Tray {
         let mut indicator = AppIndicator::new("Jenkins Tray", "");
-        indicator.set_status(AppIndicatorStatus::APP_INDICATOR_STATUS_ACTIVE);
+        indicator.set_status(AppIndicatorStatus::Active);
         let status = TrayStatus::Unknown;
         indicator.set_icon_full(&status.icon_name(), status.desc());
 
