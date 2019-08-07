@@ -15,6 +15,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 use reqwest::{Client, IntoUrl, Url};
+use serde::{Deserialize, Serialize};
 
 use std::error::Error;
 
@@ -156,7 +157,7 @@ impl JenkinsView {
         jenkins_url: T,
         username: Option<String>,
         access_token: Option<String>,
-    ) -> Result<JenkinsView, Box<Error>> {
+    ) -> Result<JenkinsView, Box<dyn Error>> {
         let jenkins_url = jenkins_url.into_url()?;
         let client = Client::new();
         Ok(JenkinsView {
@@ -167,7 +168,7 @@ impl JenkinsView {
         })
     }
 
-    pub fn retrieve_jobs(&self) -> Result<Vec<Job>, Box<Error>> {
+    pub fn retrieve_jobs(&self) -> Result<Vec<Job>, Box<dyn Error>> {
         let url = self
             .jenkins_url
             .join("api/json?tree=jobs[name,color,lastBuild[number,result,timestamp]]")?;

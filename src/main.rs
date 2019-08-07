@@ -15,17 +15,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 #![forbid(unsafe_code)]
-extern crate reqwest;
-#[macro_use]
-extern crate serde_derive;
-extern crate serde;
 
-extern crate find_folder;
-extern crate gtk;
-extern crate gtk_sys;
-extern crate libappindicator;
-extern crate open;
-extern crate toml;
+use gtk;
+use open;
 
 mod config;
 mod jenkins;
@@ -83,7 +75,7 @@ fn main() {
     gtk::main();
 }
 
-fn read_config_file() -> Result<Config, Box<Error>> {
+fn read_config_file() -> Result<Config, Box<dyn Error>> {
     let mut path = xdg_basedir::config_home();
     path.push("jenkins-tray");
     path.push("settings.toml");

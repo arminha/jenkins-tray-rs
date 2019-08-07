@@ -14,6 +14,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
+use serde::{Deserialize, Serialize};
 use toml;
 
 use std::error::Error;
@@ -35,14 +36,14 @@ pub struct JenkinsConfig {
 }
 
 impl Config {
-    pub fn from_file(path: &Path) -> Result<Config, Box<Error>> {
+    pub fn from_file(path: &Path) -> Result<Config, Box<dyn Error>> {
         let mut file = File::open(path)?;
         let mut content = String::new();
         file.read_to_string(&mut content)?;
-        toml::from_str(&content).map_err(|e| Box::new(e) as Box<Error>)
+        toml::from_str(&content).map_err(|e| Box::new(e) as Box<dyn Error>)
     }
 
-    pub fn write_to_file(&self, path: &Path) -> Result<(), Box<Error>> {
+    pub fn write_to_file(&self, path: &Path) -> Result<(), Box<dyn Error>> {
         let content = toml::to_string(self)?;
         let mut file = File::create(path)?;
         file.write_all(content.as_bytes())?;

@@ -5,6 +5,7 @@ authors = ["Armin Häberling <armin.aha@gmail.com>"]
 license = "GPL-3.0"
 readme = "README.md"
 repository = "https://github.com/arminha/jenkins-tray-rs"
+edition = "2018"
 
 [profile.release]
 lto = true
