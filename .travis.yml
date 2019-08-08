@@ -9,7 +9,7 @@ matrix:
   allow_failures:
     - rust: nightly
 
-dist: trusty
+dist: xenial
 sudo: false
 
 addons:
