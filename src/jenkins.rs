@@ -212,5 +212,4 @@ mod test {
         let jobs = vec![job];
         assert_eq!(JenkinsStatus::NotBuilt, aggregate_status(jobs));
     }
-
 }
