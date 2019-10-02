@@ -85,5 +85,4 @@ access_token = "token"
 "#;
         assert_eq!(expected, toml_string);
     }
-
 }
