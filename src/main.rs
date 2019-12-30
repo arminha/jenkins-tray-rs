@@ -67,7 +67,7 @@ fn main() {
         if let Some(status) = rx.try_iter().next() {
             update_tray(&tray_cell, status);
         }
-        gtk::Continue(true)
+        gtk::prelude::Continue(true)
     });
 
     start_periodic_update(tx, jenkins, Duration::from_secs(30));
