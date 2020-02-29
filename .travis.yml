@@ -1,7 +1,7 @@
 language: rust
 
 rust:
-  - 1.31.0
+  - 1.39.0
   - stable
   - beta
   - nightly
@@ -9,7 +9,7 @@ matrix:
   allow_failures:
     - rust: nightly
 
-dist: trusty
+dist: xenial
 sudo: false
 
 addons:
