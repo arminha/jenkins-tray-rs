@@ -14,7 +14,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
-use reqwest::{Client, IntoUrl, Url};
+use reqwest::blocking::Client;
+use reqwest::{IntoUrl, Url};
 use serde::{Deserialize, Serialize};
 
 use std::error::Error;
@@ -177,7 +178,7 @@ impl JenkinsView {
             request =
                 request.basic_auth(self.username.as_ref().unwrap(), self.access_token.as_ref());
         }
-        let mut resp = request.send()?;
+        let resp = request.send()?;
         let job_list: JobList = resp.json()?;
         Ok(job_list.jobs)
     }
