@@ -14,8 +14,8 @@ lto = true
 reqwest = "0.9"
 serde = "1.0"
 serde_derive = "1.0"
-libappindicator = { git = "https://github.com/arminha/libappindicator-rs", branch = "update" }
-gtk = { version = "0.8", features = ["v3_16"] }
+libappindicator = "0.5.1"
+gtk = { version = "0.8.1", features = ["v3_16"] }
 gtk-sys = "0.9"
 find_folder = "0.3"
 open = "1.3"
