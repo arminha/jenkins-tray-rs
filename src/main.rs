@@ -150,7 +150,7 @@ fn update_tray(tray_cell: &Rc<RefCell<Tray>>, status: JenkinsStatus) {
 fn retrieve_status(jenkins: &JenkinsView) -> Option<JenkinsStatus> {
     match jenkins.retrieve_jobs() {
         Err(e) => {
-            println!("Error: {}\n{:?}", e.description(), e);
+            println!("Error: {}\n{:?}", e, e);
             None
         }
         Ok(jobs) => {
