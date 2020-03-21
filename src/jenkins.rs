@@ -213,4 +213,87 @@ mod test {
         let jobs = vec![job];
         assert_eq!(JenkinsStatus::NotBuilt, aggregate_status(jobs));
     }
+
+    #[test]
+    fn deserialize_empty_job_list() {
+        let json = r#"{"jobs": []}"#;
+        let list: JobList = serde_json::from_str(json).unwrap();
+        assert_eq!(list.jobs, [])
+    }
+
+    #[test]
+    fn deserialize_job_list_with_one_job() {
+        let json = r#"{"jobs": [
+  {
+      "name": "jobname",
+      "color": "blue",
+      "lastBuild": {
+        "number": 28,
+        "result": "SUCCESS",
+        "timestamp": 1547148202107
+      }
+  }
+]}"#;
+        let list: JobList = serde_json::from_str(json).unwrap();
+        assert_eq!(
+            list.jobs,
+            [Job {
+                name: "jobname".to_owned(),
+                color: Color::Blue,
+                last_build: Some(Build {
+                    number: 28,
+                    result: Some(BuildResult::Success),
+                    timestamp: 1547148202107
+                })
+            }]
+        )
+    }
+
+    #[test]
+    fn deserialize_job_without_build_result() {
+        let json = r#"{"jobs": [
+  {
+      "name": "jobname",
+      "color": "grey_anime",
+      "lastBuild": {
+        "number": 28,
+        "result": null,
+        "timestamp": 1547148202107
+      }
+  }
+]}"#;
+        let list: JobList = serde_json::from_str(json).unwrap();
+        assert_eq!(
+            list.jobs,
+            [Job {
+                name: "jobname".to_owned(),
+                color: Color::GreyAnime,
+                last_build: Some(Build {
+                    number: 28,
+                    result: None,
+                    timestamp: 1547148202107
+                })
+            }]
+        )
+    }
+
+    #[test]
+    fn deserialize_job_without_build() {
+        let json = r#"{"jobs": [
+  {
+      "name": "jobname",
+      "color": "grey",
+      "lastBuild": null
+  }
+]}"#;
+        let list: JobList = serde_json::from_str(json).unwrap();
+        assert_eq!(
+            list.jobs,
+            [Job {
+                name: "jobname".to_owned(),
+                color: Color::Grey,
+                last_build: None
+            }]
+        )
+    }
 }
