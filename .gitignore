@@ -2,3 +2,7 @@ target/
 **/*.rs.bk
 
 .vagrant/
+
+# IntelliJ
+.idea/
+*.iml
