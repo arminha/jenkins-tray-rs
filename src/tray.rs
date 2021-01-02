@@ -14,7 +14,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
-use find_folder;
 use gtk::{
     Box, ContainerExt, GtkMenuItemExt, IconSize, Image, Label, Menu, MenuItem, MenuShellExt,
     Orientation, WidgetExt,

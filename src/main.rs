@@ -16,9 +16,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 #![forbid(unsafe_code)]
 
-use gtk;
-use open;
-
 mod config;
 mod jenkins;
 mod tray;
