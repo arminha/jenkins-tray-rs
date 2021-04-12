@@ -16,7 +16,7 @@ jobs:
           - stable
           - beta
           - nightly
-          - 1.40.0
+          - 1.46.0
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
@@ -46,7 +46,7 @@ jobs:
           - stable
           - beta
           - nightly
-          - 1.40.0
+          - 1.46.0
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
@@ -102,8 +102,7 @@ jobs:
           - stable
           - beta
           - nightly
-          # 1.40 does not support msrv keyword
-          # - 1.40.0
+          - 1.46.0
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
