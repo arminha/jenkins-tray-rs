@@ -11,12 +11,13 @@ jobs:
     name: Check
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         rust:
           - stable
           - beta
           - nightly
-          - 1.39.0
+          - 1.46.0
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
@@ -41,12 +42,13 @@ jobs:
     name: Test Suite
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         rust:
           - stable
           - beta
           - nightly
-          - 1.39.0
+          - 1.46.0
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
@@ -97,12 +99,13 @@ jobs:
     name: Clippy
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         rust:
           - stable
           - beta
           - nightly
-          - 1.39.0
+          - 1.46.0
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2

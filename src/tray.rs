@@ -61,7 +61,7 @@ pub struct Tray {
 
 fn create_menu_item(label: &str, icon_name: Option<&str>) -> MenuItem {
     if let Some(icon_name) = icon_name {
-        let icon = Image::new_from_icon_name(Some(icon_name), IconSize::Menu);
+        let icon = Image::from_icon_name(Some(icon_name), IconSize::Menu);
         let lbl = Label::new(Some(label));
         let b = Box::new(Orientation::Horizontal, 6);
         b.add(&icon);
@@ -70,7 +70,7 @@ fn create_menu_item(label: &str, icon_name: Option<&str>) -> MenuItem {
         mi.add(&b);
         mi
     } else {
-        MenuItem::new_with_label(label)
+        MenuItem::with_label(label)
     }
 }
 
