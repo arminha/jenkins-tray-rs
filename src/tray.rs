@@ -15,8 +15,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 use gtk::{
-    Box, ContainerExt, GtkMenuItemExt, IconSize, Image, Label, Menu, MenuItem, MenuShellExt,
-    Orientation, WidgetExt,
+    prelude::{ContainerExt, GtkMenuItemExt, MenuShellExt, WidgetExt},
+    Box, IconSize, Image, Label, Menu, MenuItem, Orientation,
 };
 use libappindicator::{AppIndicator, AppIndicatorStatus};
 

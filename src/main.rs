@@ -60,7 +60,7 @@ fn main() {
     tray.add_menu_item("Exit", Some("application-exit"), gtk::main_quit);
 
     let tray_cell = Rc::new(RefCell::new(tray));
-    glib::timeout_add_local(500, move || {
+    glib::timeout_add_local(Duration::from_millis(500), move || {
         if let Some(status) = rx.try_iter().next() {
             update_tray(&tray_cell, status);
         }
