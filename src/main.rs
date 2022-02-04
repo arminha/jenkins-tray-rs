@@ -48,8 +48,8 @@ fn main() {
     let jenkins = Arc::new(
         JenkinsView::new(
             &jenkins_config.url,
-            (&jenkins_config.user).clone(),
-            (&jenkins_config.access_token).clone(),
+            jenkins_config.user.clone(),
+            jenkins_config.access_token.clone(),
         )
         .unwrap(),
     );
