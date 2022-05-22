@@ -25,7 +25,7 @@ struct JobList {
     jobs: Vec<Job>,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct Job {
     name: String,
     color: Color,
@@ -33,7 +33,7 @@ pub struct Job {
     last_build: Option<Build>,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 enum Color {
     #[serde(rename = "red")]
     Red,
@@ -66,14 +66,14 @@ enum Color {
     NotBuiltAnime,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 struct Build {
     number: u32,
     result: Option<BuildResult>,
     timestamp: u64,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 enum BuildResult {
     #[serde(rename = "SUCCESS")]
     Success,
