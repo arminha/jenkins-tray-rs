@@ -87,7 +87,7 @@ enum BuildResult {
     Aborted,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum JenkinsStatus {
     Success,
     Unstable(Job),
